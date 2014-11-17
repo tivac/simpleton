@@ -4,23 +4,18 @@
 var path = require("path"),
     
     Nedb  = require("nedb"),
+    
     Hapi  = require("hapi"),
     Good  = require("good"),
+    Blipp = require("blipp"),
+    
     shell = require("shelljs"),
     
     server = new Hapi.Server(3000),
     
-    releases = new Nedb({ filename : "./data/releases.db", autoload : true }),
-    types    = new Nedb({ filename : "./data/types.db", autoload : true }),
-    users    = new Nedb({ filename : "./data/users.db", autoload : true });
-
-shell.find("./routes").forEach(function(item) {
-    if(!shell.test("-f", item)) {
-        return;
-    }
-    
-    server.route(require("./" + item));
-});
+    releases = new Nedb({ filename : "../data/releases.db", autoload : true }),
+    types    = new Nedb({ filename : "../data/types.db", autoload : true }),
+    users    = new Nedb({ filename : "../data/users.db", autoload : true });
 
 // Default public files route
 server.route({
@@ -33,15 +28,19 @@ server.route({
     }
 });
 
-server.pack.register({
-    plugin: Good,
-    options: {
-        reporters: [{
-            reporter: require("good-console"),
-            args:[{ log: "*", request: "*" }]
-        }]
-    }
-}, function (err) {
+server.pack.register([
+    {
+        plugin : Good,
+        options : {
+            reporters : [{
+                reporter : require("good-console"),
+                args : [{ log : "*", request : "*" }]
+            }]
+        }
+    },
+    //{ plugin : Blipp },
+    { plugin : require("./releases") }
+], function (err) {
     if (err) {
         throw err; // something bad happened loading the plugin
     }
