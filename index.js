@@ -2,27 +2,51 @@
 "use strict";
 
 var path = require("path"),
-    orm = require("orm");
+    
+    Nedb  = require("nedb"),
+    Hapi  = require("hapi"),
+    Good  = require("good"),
+    shell = require("shelljs"),
+    
+    server = new Hapi.Server(3000),
+    
+    releases = new Nedb({ filename : "./data/releases.db", autoload : true }),
+    types    = new Nedb({ filename : "./data/types.db", autoload : true }),
+    users    = new Nedb({ filename : "./data/users.db", autoload : true });
 
-orm.connect("sqlite://db.sqlite", function(err, db) {
-    if(err) {
-        return console.error(err);
+shell.find("./routes").forEach(function(item) {
+    if(!shell.test("-f", item)) {
+        return;
     }
-     
-    db.load("./models/release", function(err) {
-        var Release = db.models.release;
-        
-        Release.sync(function() {
-            Release.find({
-                name : "Fooga"
-            }, function(err, releases) {
-                
-                releases.forEach(function(release) {
-                    release.launch = new Date();
-                    
-                    release.save();
-                });
-            });
-        });
+    
+    server.route(require("./" + item));
+});
+
+// Default public files route
+server.route({
+    method: 'GET',
+    path: '/{param*}',
+    handler: {
+        directory: {
+            path: 'public'
+        }
+    }
+});
+
+server.pack.register({
+    plugin: Good,
+    options: {
+        reporters: [{
+            reporter: require("good-console"),
+            args:[{ log: "*", request: "*" }]
+        }]
+    }
+}, function (err) {
+    if (err) {
+        throw err; // something bad happened loading the plugin
+    }
+
+    server.start(function () {
+        server.log("info", "Server running at: " + server.info.uri);
     });
 });

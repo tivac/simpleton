@@ -1,10 +1,11 @@
 {
   "name": "simpleton",
   "version": "0.0.1",
-  "description": "Simple SQLite-based API CMS, inspired by prismic.io and WebHook",
+  "description": "Simple API CMS, inspired by prismic.io and WebHook",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "node ."
   },
   "keywords": [
     "api",
@@ -15,8 +16,11 @@
   "author": "Patrick Cavit <pcavit@gmail.com> (http://patcavit.com/)",
   "license": "MIT",
   "dependencies": {
-    "orm": "^2.1.19",
-    "sqlite3": "^3.0.4"
+    "good": "^4.0.0",
+    "good-console": "^2.0.1",
+    "hapi": "^7.5.2",
+    "nedb": "^0.11.1",
+    "shelljs": "^0.3.0"
   },
   "devDependencies": {
     "mocha": "^2.0.1"
