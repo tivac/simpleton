@@ -5,7 +5,8 @@
   "main": "./src/index.js",
   "scripts": {
     "test": "mocha",
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "watch": "supervisor ./src/index.js"
   },
   "keywords": [
     "api",
