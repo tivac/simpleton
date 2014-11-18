@@ -20,8 +20,9 @@
     "good": "^4.0.0",
     "good-console": "^2.0.1",
     "hapi": "^7.5.2",
-    "nedb": "^0.11.1",
-    "shelljs": "^0.3.0"
+    "joi": "^4.9.0",
+    "lout": "^5.1.2",
+    "nedb": "^0.11.1"
   },
   "devDependencies": {
     "mocha": "^2.0.1"
