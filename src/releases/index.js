@@ -3,34 +3,42 @@
 
 var joi = require("joi"),
     dumb = function(req, reply) {
+        console.log(req.models);
+        
         reply({ "text" : "hi" });
     };
 
 exports.register = function(plugin, options, next) {
+    console.log(plugin.config);
+    
     // Get All
     plugin.route({
-        path    : "/api/releases",
+        path    : "/releases",
         method  : "GET",
-        handler : dumb
+        handler : function(req, reply) {
+            req.models.releases.find({}, reply);
+        }
     });
     
     // Get One
     plugin.route({
-        path    : "/api/releases/{id}",
+        path    : "/releases/{id}",
         method  : "GET",
-        handler : dumb,
         config  : {
             validate : {
                 params : {
                     id : joi.number().integer().min(1)
                 }
             }
+        },
+        handler : function(req, reply) {
+            req.models.releases.findOne({ _id : req.params.id }, reply);
         }
     });
     
     // Create One
     plugin.route({
-        path    : "/api/releases",
+        path    : "/releases",
         method  : "POST",
         handler : dumb,
         config  : {
@@ -45,7 +53,7 @@ exports.register = function(plugin, options, next) {
     
     // Edit One
     plugin.route({
-        path    : "/api/releases/{id}",
+        path    : "/releases/{id}",
         method  : "PUT",
         handler : dumb,
         config  : {
@@ -59,7 +67,7 @@ exports.register = function(plugin, options, next) {
     
     // Delete One
     plugin.route({
-        path    : "/api/releases/{id}",
+        path    : "/releases/{id}",
         method  : "DELETE",
         handler : dumb,
         config  : {
