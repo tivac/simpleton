@@ -1,15 +1,9 @@
 /*jshint node:true */
 "use strict";
 
-var Nedb  = require("nedb"),
+var Hapi  = require("hapi"),
     
-    Hapi  = require("hapi"),
-    
-    server = new Hapi.Server(3000),
-    
-    releases = new Nedb({ filename : "../data/releases.db", autoload : true }),
-    types    = new Nedb({ filename : "../data/types.db", autoload : true }),
-    users    = new Nedb({ filename : "../data/users.db", autoload : true });
+    server = new Hapi.Server(3000);
 
 server.pack.register([
     {
@@ -23,9 +17,15 @@ server.pack.register([
     },
     require("blipp"),
     require("lout"),
+    // My plugins
+    require("./databases"),
     require("./releases"),
     require("./public")
-], function (err) {
+], {
+    route : {
+        prefix : "/api"
+    }
+}, function (err) {
     if (err) {
         throw err; // something bad happened loading the plugin
     }
