@@ -3,12 +3,12 @@
 
 exports.register = function(plugin, options, next) {
     // Default public files route
-    server.route({
-        method: 'GET',
-        path: '/{param*}',
+    plugin.route({
+        method: "GET",
+        path: "/{param*}",
         handler: {
             directory: {
-                path: 'public'
+                path: "public"
             }
         },
         config : {
