@@ -88,6 +88,10 @@ exports.register = function(plugin, options, next) {
                         return reply(error);
                     }
 
+                    if(!modified) {
+                        return reply(boom.notFound("Unknown Release"));
+                    }
+
                     reply({ modified : modified });
                 }
             );
@@ -112,6 +116,10 @@ exports.register = function(plugin, options, next) {
                 function(error, removed) {
                     if(error) {
                         return reply(error);
+                    }
+
+                    if(!removed) {
+                        return reply(boom.notFound("Unknown Release"));
                     }
 
                     reply({ removed : removed });
