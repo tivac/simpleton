@@ -1,11 +1,14 @@
 /*jshint node:true */
 "use strict";
 
-var joi = require("joi"),
-    dumb = function(req, reply) {
-        console.log(req.models);
-        
-        reply({ "text" : "hi" });
+var joi  = require("joi"),
+    boom = require("boom"),
+    validators = {
+        id      : joi.string().length(16),
+        release : joi.object().keys({
+            name : joi.string(),
+            live : joi.date().optional()
+        })
     };
 
 exports.register = function(plugin, options, next) {
@@ -27,12 +30,25 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : joi.string().length(16)
+                    id : validators.id
                 }
             }
         },
         handler : function(req, reply) {
-            req.models.releases.findOne({ _id : req.params.id }, reply);
+            req.models.releases.findOne(
+                { _id : req.params.id },
+                function(error, doc) {
+                    if(error) {
+                        return reply(error);
+                    }
+
+                    if(!doc) {
+                        return reply(boom.notFound("Unknown Release"));
+                    }
+
+                    reply(doc);
+                }
+            );
         }
     });
     
@@ -42,10 +58,7 @@ exports.register = function(plugin, options, next) {
         method  : "POST",
         config  : {
             validate : {
-                payload : joi.object().keys({
-                    name : joi.string(),
-                    live : joi.date().optional()
-                })
+                payload : validators.release
             }
         },
         handler : function(req, reply) {
@@ -60,12 +73,9 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : joi.string().length(16)
+                    id : validators.id
                 },
-                payload : joi.object().keys({
-                    name : joi.string(),
-                    live : joi.date().optional()
-                })
+                payload : validators.release
             }
         },
         handler : function(req, reply) {
@@ -88,13 +98,25 @@ exports.register = function(plugin, options, next) {
     plugin.route({
         path    : "/releases/{id}",
         method  : "DELETE",
-        handler : dumb,
         config  : {
             validate : {
                 params : {
-                    id : joi.number().integer().min(1)
+                    id : validators.id
                 }
             }
+        },
+        handler : function(req, reply) {
+            req.models.releases.remove(
+                { _id : req.params.id },
+                {},
+                function(error, removed) {
+                    if(error) {
+                        return reply(error);
+                    }
+
+                    reply({ removed : removed });
+                }
+            );
         }
     });
     
