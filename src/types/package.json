@@ -1,0 +1,8 @@
+{
+  "name": "types",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "Patrick Cavit <pcavit@gmail.com> (http://patcavit.com/)",
+  "license": "MIT"
+}

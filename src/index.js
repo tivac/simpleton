@@ -19,6 +19,7 @@ server.pack.register([
     // My plugins
     require("./databases"),
     require("./releases"),
+    require("./types"),
     require("./public")
 ], {
     route : {

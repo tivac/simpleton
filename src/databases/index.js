@@ -17,7 +17,7 @@ exports.register = function(plugin, options, next) {
                 cb(null, db);
             });
         },
-        types    : function(cb) {
+        types : function(cb) {
             var db = new Nedb({ filename : "../data/types.db" });
             
             db.loadDatabase(function(err) {
@@ -28,7 +28,7 @@ exports.register = function(plugin, options, next) {
                 cb(null, db);
             });
         },
-        users    : function(cb) {
+        users : function(cb) {
             var db = new Nedb({ filename : "../data/users.db" });
             
             db.loadDatabase(function(err) {
