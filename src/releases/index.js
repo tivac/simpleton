@@ -12,8 +12,6 @@ var joi  = require("joi"),
     };
 
 exports.register = function(plugin, options, next) {
-    console.log(plugin.config);
-    
     // Get All
     plugin.route({
         path    : "/releases",
