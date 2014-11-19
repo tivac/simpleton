@@ -27,7 +27,7 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : joi.number().integer().min(1)
+                    id : joi.string().length(16)
                 }
             }
         },
@@ -49,13 +49,7 @@ exports.register = function(plugin, options, next) {
             }
         },
         handler : function(req, reply) {
-            req.models.releases.insert(req.payload, function(error, doc) {
-                if(error) {
-                    return reply(error);
-                }
-
-                reply(doc);
-            });
+            req.models.releases.insert(req.payload, reply);
         }
     });
     
@@ -63,13 +57,30 @@ exports.register = function(plugin, options, next) {
     plugin.route({
         path    : "/releases/{id}",
         method  : "PUT",
-        handler : dumb,
         config  : {
             validate : {
                 params : {
-                    id : joi.number().integer().min(1)
-                }
+                    id : joi.string().length(16)
+                },
+                payload : joi.object().keys({
+                    name : joi.string(),
+                    live : joi.date().optional()
+                })
             }
+        },
+        handler : function(req, reply) {
+            req.models.releases.update(
+                { _id : req.params.id },
+                req.payload,
+                {},
+                function(error, modified) {
+                    if(error) {
+                        return reply(error);
+                    }
+
+                    reply({ modified : modified });
+                }
+            );
         }
     });
     
