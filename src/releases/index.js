@@ -40,7 +40,6 @@ exports.register = function(plugin, options, next) {
     plugin.route({
         path    : "/releases",
         method  : "POST",
-        handler : dumb,
         config  : {
             validate : {
                 payload : joi.object().keys({
@@ -48,6 +47,15 @@ exports.register = function(plugin, options, next) {
                     live : joi.date().optional()
                 })
             }
+        },
+        handler : function(req, reply) {
+            req.models.releases.insert(req.payload, function(error, doc) {
+                if(error) {
+                    return reply(error);
+                }
+
+                reply(doc);
+            });
         }
     });
     

@@ -2,7 +2,6 @@
 "use strict";
 
 var Hapi  = require("hapi"),
-    
     server = new Hapi.Server(3000);
 
 server.pack.register([
