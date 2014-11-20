@@ -20,6 +20,7 @@ server.pack.register([
     require("./databases"),
     require("./releases"),
     require("./types"),
+    require("./items"),
     require("./public")
 ], {
     route : {

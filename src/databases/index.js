@@ -44,6 +44,8 @@ exports.register = function(plugin, options, next) {
             return next(error);
         }
         
+        plugin.app.models = models;
+        
         plugin.ext("onPreHandler", function(request, done) {
             request.models = models;
             
