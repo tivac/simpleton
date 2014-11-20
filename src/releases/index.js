@@ -3,12 +3,12 @@
 
 var joi  = require("joi"),
     boom = require("boom"),
-    validators = {
+    valid = {
         id      : joi.string().length(16),
-        release : joi.object().keys({
+        release : {
             name : joi.string(),
             live : joi.date().optional()
-        })
+        }
     };
 
 exports.register = function(plugin, options, next) {
@@ -17,7 +17,13 @@ exports.register = function(plugin, options, next) {
         path    : "/releases",
         method  : "GET",
         handler : function(req, reply) {
-            req.models.releases.find({}, reply);
+            req.models.releases.find({}, function(error, docs) {
+                if(error) {
+                    return reply(error);
+                }
+                
+                reply(docs.map(function(doc) { return doc._id; }));
+            });
         }
     });
     
@@ -28,7 +34,7 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : validators.id
+                    id : valid.id
                 }
             }
         },
@@ -56,7 +62,7 @@ exports.register = function(plugin, options, next) {
         method  : "POST",
         config  : {
             validate : {
-                payload : validators.release
+                payload : valid.release
             }
         },
         handler : function(req, reply) {
@@ -71,9 +77,9 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : validators.id
+                    id : valid.id
                 },
-                payload : validators.release
+                payload : valid.release
             }
         },
         handler : function(req, reply) {
@@ -103,7 +109,7 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : validators.id
+                    id : valid.id
                 }
             }
         },
