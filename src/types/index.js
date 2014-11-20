@@ -3,26 +3,23 @@
 
 var joi  = require("joi"),
     boom = require("boom"),
-    validators = {
+    valid = {
         id   : joi.string().length(16),
-        type : joi.object().keys({
+        type : {
             name   : joi.string(),
-            fields : joi.array().includes(
-                joi.object().keys({
-                    name : joi.string().min(1),
-                    type : joi.array().includes(
-                        joi.string().valid([
-                            "markdown",
-                            "text",
-                            "url",
-                            "title",
-                            "image",
-                            "video"
-                        ])
-                    )
-                })
-            )
-        })
+            fields : joi.array().includes({
+                name : joi.string().min(1),
+                type : joi.string().allow([
+                    "markdown",
+                    "text",
+                    "url",
+                    "title",
+                    "image",
+                    "video"
+                ]),
+                required : joi.boolean().optional()
+            })
+        }
     };
 
 exports.register = function(plugin, options, next) {
@@ -31,7 +28,13 @@ exports.register = function(plugin, options, next) {
         path    : "/types",
         method  : "GET",
         handler : function(req, reply) {
-            req.models.types.find({}, reply);
+            req.models.types.find({}, function(error, docs) {
+                if(error) {
+                    return reply(error);
+                }
+                
+                reply(docs.map(function(doc) { return doc._id; }));
+            });
         }
     });
     
@@ -42,7 +45,7 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : validators.id
+                    id : valid.id
                 }
             }
         },
@@ -70,7 +73,7 @@ exports.register = function(plugin, options, next) {
         method  : "POST",
         config  : {
             validate : {
-                payload : validators.type
+                payload : valid.type
             }
         },
         handler : function(req, reply) {
@@ -85,9 +88,9 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : validators.id
+                    id : valid.id
                 },
-                payload : validators.type
+                payload : valid.type
             }
         },
         handler : function(req, reply) {
@@ -117,7 +120,7 @@ exports.register = function(plugin, options, next) {
         config  : {
             validate : {
                 params : {
-                    id : validators.id
+                    id : valid.id
                 }
             }
         },
