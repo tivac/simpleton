@@ -1,14 +1,10 @@
 /*jshint node:true */
 "use strict";
 
-var joi  = require("joi"),
-    boom = require("boom"),
+var boom = require("boom"),
     valid = {
-        id      : joi.string().length(16),
-        release : {
-            name : joi.string(),
-            live : joi.date().optional()
-        }
+        id      : require("../valid-id"),
+        release : require("./valid-release")
     };
 
 exports.register = function(plugin, options, next) {
