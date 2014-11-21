@@ -5,7 +5,7 @@ var joi  = require("joi"),
     boom = require("boom"),
     urlRegex = require("./regex-url"),
     valid = {
-        id : joi.string().length(16)
+        id : require("../valid-id")
     };
 
 function validate(type) {
@@ -29,6 +29,8 @@ exports.register = function(plugin, options, next) {
     var db = plugin.app.models.types;
     
     db.find({}, function(err, types) {
+        var schemas = [];
+        
         if(err) {
             return next(err);
         }
@@ -36,7 +38,9 @@ exports.register = function(plugin, options, next) {
         // Build dynamic validators for each type
         // TODO: won't re-build on type edit
         types.forEach(function(type) {
-            var validator = {};
+            var validator = {
+                    type    : joi.string().allow(type.name)
+                };
             
             type.fields.forEach(function(field) {
                 validator[field.name] = validate(field.type);
@@ -46,8 +50,10 @@ exports.register = function(plugin, options, next) {
                 }
             });
             
-            valid[type.name] = validator;
+            schemas.push(validator);
         });
+        
+        valid.types = schemas.length ? joi.alternatives().try(schemas) : joi.any();
         
         // Get All
         plugin.route({
@@ -97,6 +103,11 @@ exports.register = function(plugin, options, next) {
         plugin.route({
             path    : "/items",
             method  : "POST",
+            config  : {
+                validate : {
+                    payload : valid.types
+                }
+            },
             handler : function(req, reply) {
                 req.models.items.insert(req.payload, reply);
             }
@@ -162,7 +173,7 @@ exports.register = function(plugin, options, next) {
                 );
             }
         });
-    
+        
         next();
     });
 };
