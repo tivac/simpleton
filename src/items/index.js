@@ -3,21 +3,22 @@
 
 var joi  = require("joi"),
     boom = require("boom"),
+    urlRegex = require("./regex-url"),
     valid = {
         id : joi.string().length(16)
     };
 
 function validate(type) {
     switch(type) {
-        case "text":
-        case "markdown":
+        case "text" :
         case "title" :
+        case "markdown" :
             return joi.string();
 
+        case "url" :
         case "image" :
-        case "url"   :
         case "video" :
-            return joi.string().regex("./regex-url", "URL");
+            return joi.string().regex(urlRegex, "URL");
         
         default:
             return joi.any();
@@ -33,7 +34,7 @@ exports.register = function(plugin, options, next) {
         }
         
         // Build dynamic validators for each type
-        // TODO: won't re-build on change.
+        // TODO: won't re-build on type edit
         types.forEach(function(type) {
             var validator = {};
             
