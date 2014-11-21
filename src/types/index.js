@@ -1,25 +1,10 @@
 /*jshint node:true */
 "use strict";
 
-var joi  = require("joi"),
-    boom = require("boom"),
+var boom = require("boom"),
     valid = {
-        id   : joi.string().length(16),
-        type : {
-            name   : joi.string(),
-            fields : joi.array().includes({
-                name : joi.string().min(1),
-                type : joi.string().allow([
-                    "markdown",
-                    "text",
-                    "url",
-                    "title",
-                    "image",
-                    "video"
-                ]),
-                required : joi.boolean().optional()
-            })
-        }
+        id   : require("../valid-id"),
+        type : require("./valid-type")
     };
 
 exports.register = function(plugin, options, next) {
