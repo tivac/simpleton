@@ -1,6 +1,12 @@
 /*jshint node:true */
 "use strict";
 
+function throwError(err) {
+    if (err) {
+        throw err;
+    }
+}
+
 var Hapi  = require("hapi"),
     server = new Hapi.Server();
 
@@ -9,8 +15,18 @@ server.connection({
     port : 3000
 });
 
-// Plugins which shouldn't be prefixed
+// Debugging route
+server.route({
+    method : "GET",
+    path : "/",
+    handler : function(req, reply) {
+        reply("hi");
+    }
+});
+
+// Hapi Plugins
 server.register([
+    require("lout"),
     require("tv"),
     {
         register : require("good"),
@@ -21,16 +37,10 @@ server.register([
             }]
         }
     },
-], function (err) {
-    if (err) {
-        throw err; // something bad happened loading the plugin
-    }
-});
+], throwError);
 
+// Simpleton plugins
 server.register([
-    require("lout"),
-
-    // My plugins
     require("./databases"),
     require("./releases"),
     require("./types"),
@@ -40,19 +50,7 @@ server.register([
     routes : {
         prefix : "/api"
     }
-}, function (err) {
-    if (err) {
-        throw err; // something bad happened loading the plugin
-    }
-});
-
-server.route({
-    method : "GET",
-    path : "/",
-    handler : function(req, reply) {
-        reply("hi");
-    }
-});
+}, throwError);
 
 server.start(function () {
     server.log("info", "Server running at: " + server.info.uri);
