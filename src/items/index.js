@@ -25,8 +25,8 @@ function validate(type) {
     }
 }
 
-exports.register = function(plugin, options, next) {
-    var db = plugin.app.models.types;
+exports.register = function(server, options, next) {
+    var db = server.app.models.types;
     
     db.find({}, function(err, types) {
         var schemas = [];
@@ -56,7 +56,7 @@ exports.register = function(plugin, options, next) {
         valid.types = schemas.length ? joi.alternatives().try(schemas) : joi.any();
         
         // Get All
-        plugin.route({
+        server.route({
             path    : "/items",
             method  : "GET",
             handler : function(req, reply) {
@@ -71,7 +71,7 @@ exports.register = function(plugin, options, next) {
         });
         
         // Get One
-        plugin.route({
+        server.route({
             path    : "/items/{id}",
             method  : "GET",
             config  : {
@@ -100,7 +100,7 @@ exports.register = function(plugin, options, next) {
         });
         
         // Create One
-        plugin.route({
+        server.route({
             path    : "/items",
             method  : "POST",
             config  : {
@@ -114,7 +114,7 @@ exports.register = function(plugin, options, next) {
         });
         
         // Edit One
-        plugin.route({
+        server.route({
             path    : "/items/{id}",
             method  : "PUT",
             config  : {
@@ -145,7 +145,7 @@ exports.register = function(plugin, options, next) {
         });
         
         // Delete One
-        plugin.route({
+        server.route({
             path    : "/items/{id}",
             method  : "DELETE",
             config  : {

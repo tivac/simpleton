@@ -7,9 +7,9 @@ var boom = require("boom"),
         release : require("./valid-release")
     };
 
-exports.register = function(plugin, options, next) {
+exports.register = function(server, options, next) {
     // Get All
-    plugin.route({
+    server.route({
         path    : "/releases",
         method  : "GET",
         handler : function(req, reply) {
@@ -24,7 +24,7 @@ exports.register = function(plugin, options, next) {
     });
     
     // Get One
-    plugin.route({
+    server.route({
         path    : "/releases/{id}",
         method  : "GET",
         config  : {
@@ -53,7 +53,7 @@ exports.register = function(plugin, options, next) {
     });
     
     // Create One
-    plugin.route({
+    server.route({
         path    : "/releases",
         method  : "POST",
         config  : {
@@ -67,7 +67,7 @@ exports.register = function(plugin, options, next) {
     });
     
     // Edit One
-    plugin.route({
+    server.route({
         path    : "/releases/{id}",
         method  : "PUT",
         config  : {
@@ -99,7 +99,7 @@ exports.register = function(plugin, options, next) {
     });
     
     // Delete One
-    plugin.route({
+    server.route({
         path    : "/releases/{id}",
         method  : "DELETE",
         config  : {

@@ -19,12 +19,12 @@ function loadDb(file, done) {
     });
 }
 
-exports.register = function(plugin, options, next) {
+exports.register = function(server, options, next) {
     async.parallel({
         releases : loadDb.bind(null, "releases.json"),
-        types : loadDb.bind(null, "types.json"),
-        users : loadDb.bind(null, "users.json"),
-        items : loadDb.bind(null, "items.json")
+        types    : loadDb.bind(null, "types.json"),
+        users    : loadDb.bind(null, "users.json"),
+        items    : loadDb.bind(null, "items.json")
     }, function(error, models) {
         if(error) {
             return next(error);
@@ -44,12 +44,12 @@ exports.register = function(plugin, options, next) {
             }
         });
         
-        plugin.app.models = models;
+        server.app.models = models;
         
-        plugin.ext("onPreHandler", function(request, done) {
+        server.ext("onPreHandler", function(request, reply) {
             request.models = models;
             
-            done();
+            reply.continue();
         });
         
         next();

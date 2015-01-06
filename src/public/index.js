@@ -1,9 +1,9 @@
 /*jshint node:true */
 "use strict";
 
-exports.register = function(plugin, options, next) {
+exports.register = function(server, options, next) {
     // Default public files route
-    plugin.route({
+    server.route({
         method: "GET",
         path: "/{param*}",
         handler: {
