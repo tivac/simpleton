@@ -12,6 +12,7 @@ exports.register = function(server, options, next) {
             }
         },
         config : {
+            auth : false,
             plugins: {
                 lout: false
             }
