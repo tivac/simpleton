@@ -19,16 +19,4 @@ module.exports = {
             required : joi.boolean()
         }
     )
-    /*joi.object().min(1).pattern(
-        /\w+/,
-        joi.string().valid([
-            "markdown",
-            "text",
-            "url",
-            "title",
-            "image",
-            "video"
-        ]).required()
-    ).required(),
-    required : joi.array().unique().includes(joi.string().min(1)).optional()*/
 };
