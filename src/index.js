@@ -9,8 +9,9 @@ server.connection({
     port : 3000
 });
 
+// Plugins which shouldn't be prefixed
 server.register([
-    require("lout"),
+    require("tv"),
     {
         register : require("good"),
         options  : {
@@ -20,6 +21,15 @@ server.register([
             }]
         }
     },
+], function (err) {
+    if (err) {
+        throw err; // something bad happened loading the plugin
+    }
+});
+
+server.register([
+    require("lout"),
+
     // My plugins
     require("./databases"),
     require("./releases"),
