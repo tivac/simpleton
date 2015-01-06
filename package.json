@@ -18,11 +18,13 @@
   "license": "MIT",
   "dependencies": {
     "async": "^0.9.0",
+    "bell": "^2.0.0",
     "blipp": "^1.1.0",
     "boom": "^2.6.1",
     "good": "^5.1.0",
     "good-console": "^4.0.0",
     "hapi": "^8.0.0",
+    "hapi-auth-cookie": "^2.0.0",
     "joi": "^5.1.0",
     "lout": "^6.1.0",
     "nedb": "^0.11.1"
