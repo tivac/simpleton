@@ -1,132 +1,71 @@
 /*jshint node:true */
 "use strict";
 
-var boom = require("boom"),
-    valid = {
-        id   : require("../valid-id"),
-        type : require("./valid-type")
-    };
-
 exports.register = function(server, options, next) {
-    // Get All
-    server.route({
-        path    : "/types",
-        method  : "GET",
-        handler : function(req, reply) {
-            req.models.types.find({}, function(error, docs) {
-                if(error) {
-                    return reply(error);
-                }
-                
-                reply(docs.map(function(doc) { return doc._id; }));
-            });
-        }
-    });
-    
-    // Get One
-    server.route({
-        path    : "/types/{id}",
-        method  : "GET",
-        config  : {
-            validate : {
-                params : {
-                    id : valid.id
-                }
-            }
+    server.route([
+        // Get All
+        {
+            path    : "/types",
+            method  : "GET",
+            handler : require("./route-all")
         },
-        handler : function(req, reply) {
-            req.models.types.findOne(
-                { _id : req.params.id },
-                function(error, doc) {
-                    if(error) {
-                        return reply(error);
+        
+        // Get One
+        {
+            path    : "/types/{id}",
+            method  : "GET",
+            config  : {
+                validate : {
+                    params : {
+                        id : require("../valid-id")
                     }
-
-                    if(!doc) {
-                        return reply(boom.notFound("Unknown Type"));
-                    }
-
-                    reply(doc);
                 }
-            );
-        }
-    });
-    
-    // Create One
-    server.route({
-        path    : "/types",
-        method  : "POST",
-        config  : {
-            validate : {
-                payload : valid.type
-            }
+            },
+            handler : require("./route-one")
         },
-        handler : function(req, reply) {
-            req.models.types.insert(req.payload, reply);
-        }
-    });
-    
-    // Edit One
-    server.route({
-        path    : "/types/{id}",
-        method  : "PUT",
-        config  : {
-            validate : {
-                params : {
-                    id : valid.id
-                },
-                payload : valid.type
-            }
+        
+        // Create One
+        {
+            path    : "/types",
+            method  : "POST",
+            config  : {
+                validate : {
+                    payload : require("./valid-type")
+                }
+            },
+            handler : require("./route-create")
         },
-        handler : function(req, reply) {
-            req.models.types.update(
-                { _id : req.params.id },
-                req.payload,
-                {},
-                function(error, modified) {
-                    if(error) {
-                        return reply(error);
-                    }
-
-                    if(!modified) {
-                        return reply(boom.notFound("Unknown Type"));
-                    }
-
-                    reply({ modified : modified });
+        
+        // Edit One
+        {
+            path    : "/types/{id}",
+            method  : "PUT",
+            config  : {
+                validate : {
+                    params : {
+                        id : require("../valid-id")
+                    },
+                    payload : require("./valid-type")
                 }
-            );
-        }
-    });
-    
-    // Delete One
-    server.route({
-        path    : "/types/{id}",
-        method  : "DELETE",
-        config  : {
-            validate : {
-                params : {
-                    id : valid.id
-                }
-            }
+            },
+            handler : require("./route-edit")
         },
-        handler : function(req, reply) {
-            req.models.types.remove(
-                { _id : req.params.id },
-                {},
-                function(error, removed) {
-                    if(error) {
-                        return reply(error);
+        
+        // Delete One
+        {
+            path    : "/types/{id}",
+            method  : "DELETE",
+            config  : {
+                validate : {
+                    params : {
+                        id : require("../valid-id")
                     }
-
-                    if(!removed) {
-                        return reply(boom.notFound("Unknown Type"));
-                    }
-
-                    reply({ removed : removed });
                 }
-            );
+            },
+            handler : require("./route-delete")
         }
-    });
+    ]);
+
     
     next();
 };

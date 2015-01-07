@@ -1,132 +1,70 @@
 /*jshint node:true */
 "use strict";
 
-var boom = require("boom"),
-    valid = {
-        id      : require("../valid-id"),
-        release : require("./valid-release")
-    };
-
 exports.register = function(server, options, next) {
-    // Get All
-    server.route({
-        path    : "/releases",
-        method  : "GET",
-        handler : function(req, reply) {
-            req.models.releases.find({}, function(error, docs) {
-                if(error) {
-                    return reply(error);
-                }
-                
-                reply(docs.map(function(doc) { return doc._id; }));
-            });
-        }
-    });
-    
-    // Get One
-    server.route({
-        path    : "/releases/{id}",
-        method  : "GET",
-        config  : {
-            validate : {
-                params : {
-                    id : valid.id
-                }
-            }
+    server.route([
+        // Get All
+        {
+            path    : "/releases",
+            method  : "GET",
+            handler : require("./route-all")
         },
-        handler : function(req, reply) {
-            req.models.releases.findOne(
-                { _id : req.params.id },
-                function(error, doc) {
-                    if(error) {
-                        return reply(error);
+        
+        // Get One
+        {
+            path    : "/releases/{id}",
+            method  : "GET",
+            config  : {
+                validate : {
+                    params : {
+                        id : require("../valid-id")
                     }
-
-                    if(!doc) {
-                        return reply(boom.notFound("Unknown Release"));
-                    }
-
-                    reply(doc);
                 }
-            );
-        }
-    });
-    
-    // Create One
-    server.route({
-        path    : "/releases",
-        method  : "POST",
-        config  : {
-            validate : {
-                payload : valid.release
-            }
+            },
+            handler : require("./route-one")
         },
-        handler : function(req, reply) {
-            req.models.releases.insert(req.payload, reply);
-        }
-    });
-    
-    // Edit One
-    server.route({
-        path    : "/releases/{id}",
-        method  : "PUT",
-        config  : {
-            validate : {
-                params : {
-                    id : valid.id
-                },
-                payload : valid.release
-            }
+        
+        // Create One
+        {
+            path    : "/releases",
+            method  : "POST",
+            config  : {
+                validate : {
+                    payload : require("./valid-release")
+                }
+            },
+            handler : require("./route-create")
         },
-        handler : function(req, reply) {
-            req.models.releases.update(
-                { _id : req.params.id },
-                req.payload,
-                {},
-                function(error, modified) {
-                    if(error) {
-                        return reply(error);
-                    }
-
-                    if(!modified) {
-                        return reply(boom.notFound("Unknown Release"));
-                    }
-
-                    reply({ modified : modified });
+        
+        // Edit One
+        {
+            path    : "/releases/{id}",
+            method  : "PUT",
+            config  : {
+                validate : {
+                    params : {
+                        id : require("../valid-id")
+                    },
+                    payload : require("./valid-release")
                 }
-            );
-        }
-    });
-    
-    // Delete One
-    server.route({
-        path    : "/releases/{id}",
-        method  : "DELETE",
-        config  : {
-            validate : {
-                params : {
-                    id : valid.id
-                }
-            }
+            },
+            handler : require("./route-edit")
         },
-        handler : function(req, reply) {
-            req.models.releases.remove(
-                { _id : req.params.id },
-                {},
-                function(error, removed) {
-                    if(error) {
-                        return reply(error);
+        
+        // Delete One
+        {
+            path    : "/releases/{id}",
+            method  : "DELETE",
+            config  : {
+                validate : {
+                    params : {
+                        id : require("../valid-id")
                     }
-
-                    if(!removed) {
-                        return reply(boom.notFound("Unknown Release"));
-                    }
-
-                    reply({ removed : removed });
                 }
-            );
+            },
+            handler : require("./route-delete")
         }
-    });
+    ]);
     
     next();
 };
