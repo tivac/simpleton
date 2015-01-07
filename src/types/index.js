@@ -7,7 +7,7 @@ exports.register = function(server, options, next) {
         {
             path    : "/types",
             method  : "GET",
-            handler : require("./route-all")
+            handler : require("../generic/route-all")("types", "Type")
         },
         
         // Get One
@@ -21,7 +21,7 @@ exports.register = function(server, options, next) {
                     }
                 }
             },
-            handler : require("./route-one")
+            handler : require("../generic/route-one")("types", "Type")
         },
         
         // Create One
@@ -33,7 +33,7 @@ exports.register = function(server, options, next) {
                     payload : require("./valid-type")
                 }
             },
-            handler : require("./route-create")
+            handler : require("../generic/route-create")("types", "Type")
         },
         
         // Edit One
@@ -48,7 +48,7 @@ exports.register = function(server, options, next) {
                     payload : require("./valid-type")
                 }
             },
-            handler : require("./route-edit")
+            handler : require("../generic/route-edit")("types", "Type")
         },
         
         // Delete One
@@ -62,7 +62,7 @@ exports.register = function(server, options, next) {
                     }
                 }
             },
-            handler : require("./route-delete")
+            handler : require("../generic/route-delete")("types", "Type")
         }
     ]);
 
