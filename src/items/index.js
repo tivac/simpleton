@@ -1,12 +1,8 @@
 /*jshint node:true */
 "use strict";
 
-var joi  = require("joi"),
-    boom = require("boom"),
-    urlRegex = require("./regex-url"),
-    valid = {
-        id : require("../valid-id")
-    };
+var joi      = require("joi"),
+    urlRegex = require("./regex-url");
 
 function validate(type) {
     switch(type) {
@@ -53,126 +49,68 @@ exports.register = function(server, options, next) {
             schemas.push(validator);
         });
         
-        valid.types = schemas.length ? joi.alternatives().try(schemas) : joi.any();
-        
-        // Get All
-        server.route({
-            path    : "/items",
-            method  : "GET",
-            handler : function(req, reply) {
-                req.models.items.find({}, function(error, docs) {
-                    if(error) {
-                        return reply(error);
-                    }
-                    
-                    reply(docs.map(function(doc) { return doc._id; }));
-                });
-            }
-        });
-        
-        // Get One
-        server.route({
-            path    : "/items/{id}",
-            method  : "GET",
-            config  : {
-                validate : {
-                    params : {
-                        id : valid.id
-                    }
-                }
+        server.route([
+            // Get All
+            {
+                path    : "/items",
+                method  : "GET",
+                handler : require("../generic/route-all")("items", "Item")
             },
-            handler : function(req, reply) {
-                req.models.items.findOne(
-                    { _id : req.params.id },
-                    function(error, doc) {
-                        if(error) {
-                            return reply(error);
+            
+            // Get One
+            {
+                path    : "/items/{id}",
+                method  : "GET",
+                config  : {
+                    validate : {
+                        params : {
+                            id : require("../valid-id")
                         }
-
-                        if(!doc) {
-                            return reply(boom.notFound("Unknown Item"));
-                        }
-
-                        reply(doc);
                     }
-                );
-            }
-        });
-        
-        // Create One
-        server.route({
-            path    : "/items",
-            method  : "POST",
-            config  : {
-                validate : {
-                    payload : valid.types
-                }
+                },
+                handler : require("../generic/route-one")("items", "Item")
             },
-            handler : function(req, reply) {
-                req.models.items.insert(req.payload, reply);
-            }
-        });
-        
-        // Edit One
-        server.route({
-            path    : "/items/{id}",
-            method  : "PUT",
-            config  : {
-                validate : {
-                    params : {
-                        id : valid.id
+            
+            // Create One
+            {
+                path    : "/items",
+                method  : "POST",
+                config  : {
+                    validate : {
+                        payload : schemas.length ? joi.alternatives().try(schemas) : joi.any()
                     }
-                }
+                },
+                handler : require("../generic/route-create")("items", "Item")
             },
-            handler : function(req, reply) {
-                req.models.items.update(
-                    { _id : req.params.id },
-                    req.payload,
-                    {},
-                    function(error, modified) {
-                        if(error) {
-                            return reply(error);
+            
+            // Edit One
+            {
+                path    : "/items/{id}",
+                method  : "PUT",
+                config  : {
+                    validate : {
+                        params : {
+                            id : require("../valid-id")
                         }
-
-                        if(!modified) {
-                            return reply(boom.notFound("Unknown Item"));
-                        }
-
-                        reply({ modified : modified });
                     }
-                );
-            }
-        });
-        
-        // Delete One
-        server.route({
-            path    : "/items/{id}",
-            method  : "DELETE",
-            config  : {
-                validate : {
-                    params : {
-                        id : valid.id
-                    }
-                }
+                },
+                handler : require("../generic/route-edit")("items", "Item")
             },
-            handler : function(req, reply) {
-                req.models.items.remove(
-                    { _id : req.params.id },
-                    {},
-                    function(error, removed) {
-                        if(error) {
-                            return reply(error);
+            
+            // Delete One
+            {
+                path    : "/items/{id}",
+                method  : "DELETE",
+                config  : {
+                    validate : {
+                        params : {
+                            id : require("../valid-id")
                         }
-
-                        if(!removed) {
-                            return reply(boom.notFound("Unknown Item"));
-                        }
-
-                        reply({ removed : removed });
                     }
-                );
+                },
+                handler : require("../generic/route-delete")("items", "Item")
             }
-        });
+        ]);
         
         next();
     });
