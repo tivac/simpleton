@@ -41,7 +41,7 @@ server.route({
     path : "/",
     handler : function(req, reply) {
         if(!req.auth.isAuthenticated) {
-            reply("You aren't logged in");
+            return reply("You aren't logged in");
         }
 
         reply("hi " + req.auth.credentials.name + "(" + req.auth.credentials.email + ")");
